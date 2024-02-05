@@ -1,0 +1,66 @@
+/// Method using dynamic SQL
+ClassMethod ByPhone(state As %String = "")
+{
+	set select = TODO #1
+	if (state '= "") {
+		set where = TODO #2
+	}
+	else {
+		set where = ""
+	}
+	set orderby = TODO #3
+	set sql = select _ " " _ where _ " " _ orderby
+
+	// call %ExecDirect() without a first argument
+	if (state '= "") {
+		set rs = ##class(%SQL.Statement).%ExecDirect( , TODO #4)
+	}
+	else {
+		set rs = ##class(%SQL.Statement).%ExecDirect( , TODO #5)
+	}
+	if (rs.%SQLCODE = 0) { do rs.%Display() }
+	else { write !, rs.%SQLCODE, " ", rs.%Message }
+}
+
+=============================================================
+
+/// Insert method using embedded SQL
+ClassMethod Insert(nm As %String = "", ph As %String = "", sta As %String = "")
+{
+    // allEmpty is a boolean (1 or 0)
+    set allEmpty = (TODO #1)
+    quit:(allEmpty)  // if all data is empty just quit
+    set success = 0
+    &sql(TODO #2)
+    if (SQLCODE = 0) {
+        &sql(TODO #3)
+        if (SQLCODE = 0) {
+            write !, count, " records"
+            set success = 1
+        }
+    }
+    if ('success) {
+        write !, "SQLCODE: ", SQLCODE, !, %msg
+    }
+}
+
+=============================================================
+
+/// list humans by name
+Query NamePhoneList(start As %String) As %SQLQuery [ SqlProc ]
+{
+	TODO #1
+}
+
+/// method that uses NamePhoneList class query
+ClassMethod ByName(start As %String = "")
+{
+    set stmt = ##class(%SQL.Statement).%New()
+    set st = stmt.%PrepareClassQuery(TODO #2)
+    if $$$ISOK(st) {
+        set rs = stmt.%Execute(TODO #3)
+        if (rs.%SQLCODE = 0) { do rs.%Display() }
+	    else { write !, rs.%SQLCODE, " ", rs.%Message }
+    }
+    else { do $system.Status.DisplayError(st) }
+}
